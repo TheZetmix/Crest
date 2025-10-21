@@ -375,9 +375,12 @@ class Parser:
         if '[]' in type:
             name += '[]'
             type = type[0:-2]
-        self.expect(TokType.ASSIGN) # skip assign
-        expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
-        self.expect(TokType.SEMICOLON)
+        if self.current.type == TokType.SEMICOLON:
+            expr = None
+        else:
+            self.expect(TokType.ASSIGN) # skip assign
+            expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+            self.expect(TokType.SEMICOLON)
         return self.get_ir_node("VarDef", name=name, expr=expr, type=type)
     
     def get_ir_node(self, node_type, **kwargs):

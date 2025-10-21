@@ -131,9 +131,10 @@ class CodeGen:
             case "VarDef":
                 self.output.append(node[1]["type"])
                 self.output.append(node[1]["name"])
-                self.output.append('=')
-                for i in node[1]["expr"]:
-                    self.output.append(i)
+                if node[1]["expr"]:
+                    self.output.append('=')
+                    for i in node[1]["expr"]:
+                        self.output.append(i)
                 self.output.append(';');
             case "IdAssign":
                 self.output.append(node[1]["name"])

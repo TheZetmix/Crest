@@ -12,6 +12,5 @@ struct Some {
 }
 
 fn main() : int {
-    var test : Some = {5, 8};
-    printf("%d\n", sum(test.a, test.b));
+    var test : int;
 }
