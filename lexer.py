@@ -24,7 +24,8 @@ def split_src(src, delims):
     for i, part in enumerate(res):
         if (part in '=<>|&~!+-*/%^' and res[i+1] == '=') or \
            (part in "+-" and res[i+1] in "+-") or \
-           (part in "|&" and res[i+1] in "|&"):
+           (part in "|&" and res[i+1] in "|&") or \
+           (part in "-=" and res[i+1] == ">"):
             res[i] += res[i+1]
             del res[i + 1]
             
