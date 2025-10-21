@@ -1,0 +1,4 @@
+jmp main
+
+main:
+    int 0x00

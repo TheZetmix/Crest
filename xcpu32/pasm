@@ -1,0 +1,1 @@
+python3 ./asm/compile.py $1 $2

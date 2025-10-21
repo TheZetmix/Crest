@@ -1,0 +1,1 @@
+./pasm ./testes/kernel.asm ./testes_out/kernel.bin
