@@ -30,7 +30,6 @@ class CodeGen:
                     self.output.append("default")
                     self.output.append(":")
                     self.output.append("{")
-            
             case "Match":
                 self.output.append("switch")
                 self.output.append("(")
