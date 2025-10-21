@@ -8,7 +8,7 @@
 
 fn main() : int {
     var number : int = 10;
-    printf("hell yeah\n");
+    printf("penis penis\n");
     match (number) {
         case 5 || 6 -> {
             printf("number is 5 or 6\n");
