@@ -1,5 +1,5 @@
-[!c] {
-    #include "stdio.h"
+[!include] {
+    "stdio.h"
 }
 
 var iterations : int = 20;

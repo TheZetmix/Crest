@@ -1,6 +1,6 @@
-[!c] {
-    #include "stdio.h"
-    #include "stdlib.h"
+[!include] {
+    "stdio.h"
+    "stdlib.h"
 }
 
 fn main() : int {
