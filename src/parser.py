@@ -171,27 +171,42 @@ class Parser:
     def parse_inline_c(self):
         self.next() # skip [
         self.expect(TokType.NOT) # skip !
-        if self.current.literal != 'c':
-            error("not implemented")
-        self.expect(TokType.ID) # skip c
-        self.expect(TokType.RBRACE) # skip ]
-        string = ""
-        if self.current.type == TokType.STRING_LITERAL:
-            string = self.current.literal[1:-1]
-        elif self.current.type == TokType.LBODY:
-            self.next()
-            brace = 1
-            while brace > 0:
-                if self.current.type == TokType.LBODY:
-                    brace += 1
-                if self.current.type == TokType.RBODY:
-                    brace -= 1
-                if brace > 0:
-                    string += self.current.literal + " "
-                self.next()
-                
-        returned = self.get_ir_node("InlineC", string=string)
-        self.entered_bodies.append(returned)
+        match self.current.literal:
+            case 'c':
+                self.expect(TokType.ID) # skip c
+                self.expect(TokType.RBRACE) # skip ]
+                string = ""
+                if self.current.type == TokType.STRING_LITERAL:
+                    string = self.current.literal[1:-1]
+                elif self.current.type == TokType.LBODY:
+                    self.next()
+                    brace = 1
+                    while brace > 0:
+                        if self.current.type == TokType.LBODY:
+                            brace += 1
+                        if self.current.type == TokType.RBODY:
+                            brace -= 1
+                        if brace > 0:
+                            string += self.current.literal + " "
+                        self.next()
+                    returned = self.get_ir_node("InlineC", string=string)
+                    self.entered_bodies.append(returned)
+            case 'include':
+                self.expect(TokType.ID) # skip c
+                self.expect(TokType.RBRACE) # skip ]
+                string = ""
+                if self.current.type == TokType.STRING_LITERAL:
+                    string = self.current.literal[1:-1]
+                elif self.current.type == TokType.LBODY:
+                    self.next()
+                    libs = []
+                    while self.current.type != TokType.RBODY:
+                        libs.append(self.current.literal)
+                        self.next()
+                    self.next()
+                    returned = self.get_ir_node("IncludeC", libs=[i for i in libs if i not in ['\n']])
+                    self.entered_bodies.append(returned)
+            
         return returned
     
     def parse_assign_expression(self):

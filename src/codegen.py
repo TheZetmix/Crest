@@ -48,6 +48,9 @@ class CodeGen:
                 self.output.append("{")
             case "InlineC":
                 self.output.append(node[1]["string"])
+            case "IncludeC":
+                for i in node[1]["libs"]:
+                    self.output.append(f"# include {i}\n")
             case "ExprAssign":
                 match node[1]["op"]:
                     case "++" | "--":
