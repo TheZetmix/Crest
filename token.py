@@ -4,7 +4,7 @@ C_KEYWORDS = {
     'auto', 'break', 'case', 'const', 'continue', 'default',
     'double', 'else', 'enum', 'extern', 'var', 'fn', 'for', 'if',
     'register', 'return', 'static',
-    'struct', 'switch', 'typedef', 'union', 'volatile', 'while', 'foreach'
+    'struct', 'match', 'typedef', 'union', 'volatile', 'while', 'foreach'
 }
 
 class TokType(Enum):
@@ -26,7 +26,7 @@ class TokType(Enum):
     KEYWORD_RETURN       = auto()
     KEYWORD_STATIC       = auto()
     KEYWORD_STRUCT       = auto()
-    KEYWORD_SWITCH       = auto()
+    KEYWORD_MATCH        = auto()
     KEYWORD_TYPEDEF      = auto()
     KEYWORD_UNION        = auto()
     KEYWORD_VOLATILE     = auto()

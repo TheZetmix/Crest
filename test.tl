@@ -12,8 +12,8 @@ fn main() : int {
         case 5 || 6 -> {
             printf("number is 5 or 6\n");
         }
-        case 0 || 2 -> {
-            printf("number is 0 or 2\n");
+        case 0 -> {
+            printf("number is 0\n");
         }
         default -> {
             printf("idk\n")

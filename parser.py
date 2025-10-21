@@ -15,6 +15,10 @@ class Parser:
         self.vars = []
         
         while self.current.type != TokType.EOF:
+            if self.current.type == TokType.KEYWORD_MATCH:
+                parsed = self.parse_match()
+                self.ir.append(parsed)
+                self.entered_bodies.append(parsed)
             if self.current.type == TokType.KEYWORD_FOR:
                 parsed = self.parse_for()
                 self.ir.append(parsed)
@@ -85,6 +89,9 @@ class Parser:
             self.next()
         
         return
+    
+    def parse_for(self):
+        pass
     
     def parse_for(self):
         self.next() # skip for keyword
