@@ -353,11 +353,12 @@ class Parser:
                 to_append.append(i.literal)
         if to_append:
             args.append(to_append)
-            
         new_args = []
         for i in args:
             arg_name = i[0]
             arg_type = i[2]
+            if arg_type == '*':
+                arg_type = i[3] + arg_type
             new_args.append(self.get_ir_node("Arg", name=arg_name, type=arg_type))
         
         self.expect(TokType.RPAREN) # skip )
