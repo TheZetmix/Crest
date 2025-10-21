@@ -6,15 +6,12 @@
     }
 }
 
+struct Some {
+    a : int;
+    b : int;
+}
+
 fn main() : int {
-    for (i : int = 0; i < 30; ++i) {
-        match (i) {
-            case 10 || 15 || 20 {
-                printf("daaa\n");
-            }
-            default {
-                printf("%d\n", sum(i, i+5));
-            }
-        }
-    }
+    var test : Some = {5, 8};
+    printf("%d\n", sum(test.a, test.b));
 }
