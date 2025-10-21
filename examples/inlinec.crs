@@ -1,0 +1,13 @@
+[!c] {
+    #include "stdio.h"
+    
+    int global_a = 10;
+    
+    void print_global_a() {
+        printf("%d\n", global_a);
+    }
+}
+
+fn main() : int {
+    print_global_a();
+}

@@ -321,6 +321,8 @@ class Parser:
         name = self.current.literal
         self.expect(TokType.ID) # skip name
         self.expect(TokType.LPAREN) # skip (
+        if self.current.type == TokType.RPAREN:
+            return self.get_ir_node("FuncCall", name=name, args=[])
         args = []
         bol = self.pos
         # get arguments as list of expressions
@@ -334,7 +336,7 @@ class Parser:
                 brace += 1
             if self.current.type == TokType.RPAREN:
                 brace -= 1
-            
+        
         args.append([i.literal for i in self.tokens[bol:self.pos]])
         return self.get_ir_node("FuncCall", name=name, args=args)
     
