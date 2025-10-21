@@ -197,4 +197,5 @@ if __name__ == "__main__":
     with open("out.c", "w") as f:
         f.write(' '.join(gen.output))
     os.system(f"clang out.c -o out")
-
+    os.system(f"rm out.c")
+    
