@@ -91,7 +91,7 @@ class Lexer:
         self.tokens = []
         self.src = src
         self.filename = filename
-        self.delims = " .,:;(){}[]\"\'+-*/%=!&|<>^~?\n"
+        self.delims = " .,:;(){}[]#\"\'+-*/%=!&|<>^~?\n"
         self.src_split = split_src(src, self.delims)
         
     def make_all_tokens(self):
@@ -99,7 +99,7 @@ class Lexer:
         for i in self.src_split:
             if i == '\n': pos += 1
             self.tokens.append(self.make_token(i, pos))
-            
+           
         self.tokens.append(Token(TokType.EOF, "", pos))
         
     def make_token(self, part, pos):
@@ -213,8 +213,8 @@ class Lexer:
             return Token(TokType.LBODY, part, pos)
         elif part == '}':
             return Token(TokType.RBODY, part, pos)
-        elif part[0] == '#':
-            return Token(TokType.DIRECTIVE, part[1:], pos)
+        # elif part[0] == '#':
+        #     return Token(TokType.DIRECTIVE, part[1:], pos)
         elif part == '\n':
             return Token(TokType.NEWLINE, part, pos)
         else:
