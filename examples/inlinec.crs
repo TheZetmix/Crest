@@ -9,5 +9,10 @@
 }
 
 fn main() : int {
-    print_global_a();
+    print_global_a(); 
+    [!c] {
+        int x = 10;
+        int y = x - 14;
+    }
+    printf("%d\n", x + y);
 }
