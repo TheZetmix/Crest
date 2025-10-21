@@ -1,0 +1,13 @@
+[!c] {
+    #include "stdio.h"
+    #include "stdlib.h"
+}
+
+fn main() : int {
+    var msg : *char = malloc(128);
+    *(msg) = 'a';
+    *(msg+1) = 'b';
+    *(msg+2) = 'c';
+    *(msg+31) = '\0';
+    printf("%s\n", msg);
+}
