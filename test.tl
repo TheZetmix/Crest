@@ -1,16 +1,10 @@
 #include "stdio.h"
 
-[!c] {
-    int sum(int a, int b) {
-        return a + b;
-    }
-}
-
-struct Some {
-    a : int;
-    b : int;
+struct Vec2 {
+    x : int;
+    y : int;
 }
 
 fn main() : int {
-    var test : int;
+    
 }
