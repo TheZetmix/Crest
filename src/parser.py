@@ -195,8 +195,9 @@ class Parser:
                 self.expect(TokType.ID) # skip c
                 self.expect(TokType.RBRACE) # skip ]
                 string = ""
+                libs = []
                 if self.current.type == TokType.STRING_LITERAL:
-                    string = self.current.literal[1:-1]
+                    string = self.current.literal
                 elif self.current.type == TokType.LBODY:
                     self.next()
                     libs = []
@@ -204,8 +205,8 @@ class Parser:
                         libs.append(self.current.literal)
                         self.next()
                     self.next()
-                    returned = self.get_ir_node("IncludeC", libs=[i for i in libs if i not in ['\n']])
-                    self.entered_bodies.append(returned)
+                returned = self.get_ir_node("IncludeC", libs=[(i for i in libs if i not in ['\n']) if libs else string])
+                self.entered_bodies.append(returned)
             
         return returned
     
