@@ -18,6 +18,15 @@ class CodeGen:
         
     def gen_from_node(self, node):
         match node[0]:
+            case "StructDef":
+                self.output.append("typedef struct")
+                self.output.append("{")
+                for i in node[1]["fields"]:
+                    self.output.append(i[1])
+                    self.output.append(i[0])
+                    self.output.append(";")
+                self.output.append(f"}} {node[1]["name"]}")
+                self.output.append(';')
             case "MatchCase":
                 if node[1]["expr"] != None:
                     expr = [i for i in node[1]["expr"] if i != "||"]
@@ -149,9 +158,11 @@ class CodeGen:
                     self.output.append(i)
                 self.output.append(';')
             case "BodyExit":
-                if node[1]["parent"][0] == "MatchCase":
-                    self.output.append('break ;')
-                self.output.append('}')
+                match node[1]["parent"][0]:
+                    case "MatchCase":
+                        self.output.append('break ; }')
+                    case _:
+                        self.output.append('}')
             case "FuncCall":
                 self.output.append(node[1]["name"])
                 self.output.append('(')

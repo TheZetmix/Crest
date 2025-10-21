@@ -15,6 +15,9 @@ class Parser:
         self.vars = []
         
         while self.current.type != TokType.EOF:
+            if self.current.type == TokType.KEYWORD_STRUCT:
+                parsed = self.parse_struct()
+                self.ir.append(parsed)
             if self.current.type in [TokType.KEYWORD_CASE, TokType.KEYWORD_DEFAULT]:
                 parsed = self.parse_match_case()
                 self.ir.append(parsed)
@@ -94,6 +97,26 @@ class Parser:
         
         return
     
+    def parse_struct(self):
+        self.next() # skip struct keyword
+        name = self.current.literal
+        self.expect(TokType.ID)
+        self.expect(TokType.LBODY)
+        fields = []
+        while self.current.type != TokType.RBODY:
+            if self.current.type == TokType.NEWLINE:
+                self.next()
+            elif self.current.type != TokType.RBODY:
+                var_name = self.current.literal
+                self.expect(TokType.ID)
+                self.expect(TokType.COLON)
+                type = self.current.literal
+                self.expect(TokType.ID)
+                self.expect(TokType.SEMICOLON)
+                fields.append((var_name, type))
+        self.next()
+        return self.get_ir_node("StructDef", name=name, fields=fields)
+        
     def parse_match_case(self):
         if self.current.type == TokType.KEYWORD_DEFAULT:
             return self.get_ir_node("MatchCase", expr=None)
