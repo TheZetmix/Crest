@@ -1,0 +1,38 @@
+[!c] {
+    #include "stdio.h"
+    #include "stdlib.h"
+}
+
+fn main() : int {
+    var num1 : int;
+    var num2 : int;
+    var op : char;
+    while (1) {
+        printf("first: ");
+        scanf("%d", &num1);
+        printf("second: ");
+        scanf("%d", &num2);
+        printf("op: ");
+        scanf(" %c", &op);
+        match (op) {
+            case '+' {
+                printf("%d\n", num1+num2);
+            }
+            case '-' {
+                printf("%d\n", num1-num2);
+            }
+            case '*' {
+                printf("%d\n", num1*num2);
+            }
+            case '/' {
+                printf("%d\n", num1/num2);
+            }
+            case 'q' {
+                exit(0);
+            }
+            default {
+                printf("invalid op\n");
+            }
+        }
+    }
+}
