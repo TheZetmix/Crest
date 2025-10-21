@@ -18,6 +18,26 @@ class CodeGen:
         
     def gen_from_node(self, node):
         match node[0]:
+            case "MatchCase":
+                if node[1]["expr"] != None:
+                    expr = [i for i in node[1]["expr"] if i != "||"]
+                    for i in expr:
+                        self.output.append("case")
+                        self.output.append(i)
+                        self.output.append(":")
+                    self.output.append("{")
+                else:
+                    self.output.append("default")
+                    self.output.append(":")
+                    self.output.append("{")
+            
+            case "Match":
+                self.output.append("switch")
+                self.output.append("(")
+                for i in node[1]["expr"]:
+                    self.output.append(i)
+                self.output.append(")")
+                self.output.append("{")
             case "InlineC":
                 self.output.append(node[1]["string"])
             case "ExprAssign":
@@ -130,6 +150,8 @@ class CodeGen:
                     self.output.append(i)
                 self.output.append(';')
             case "BodyExit":
+                if node[1]["parent"][0] == "MatchCase":
+                    self.output.append('break ;')
                 self.output.append('}')
             case "FuncCall":
                 self.output.append(node[1]["name"])

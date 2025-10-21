@@ -3,4 +3,4 @@
  int sum ( int a , int b ) { 
  return a + b ; 
  } 
-  int main ( ) { int arr[] = { 0 , 1 , 2 , 3 , 4 , 5 } ; for ( int i = 0 ; i < sizeof ( arr ) / sizeof ( arr [ 0 ] ) ; i ++ ) { printf ( "%d\n" , sum ( arr [ i ] , i ) ) ; } }
+  int main ( ) { int number = 6 ; switch ( number ) { case 6 : case 8 : { printf ( "number is 6 or 8\n" ) ; break ; } default : { printf ( "idk\n" ) ; break ; } } }

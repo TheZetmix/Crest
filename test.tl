@@ -7,16 +7,13 @@
 }
 
 fn main() : int {
-    var number : int = 10;
+    var number : int = 6;
     match (number) {
-        case 5 || 6 -> {
-            printf("number is 5 or 6\n");
+        case 6 || 8 {
+            printf("number is 6 or 8\n");
         }
-        case 0 -> {
-            printf("number is 0\n");
-        }
-        default -> {
-            printf("idk\n")
+        default {
+            printf("idk\n");
         }
     }
 }

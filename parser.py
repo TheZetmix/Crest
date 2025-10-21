@@ -15,6 +15,10 @@ class Parser:
         self.vars = []
         
         while self.current.type != TokType.EOF:
+            if self.current.type in [TokType.KEYWORD_CASE, TokType.KEYWORD_DEFAULT]:
+                parsed = self.parse_match_case()
+                self.ir.append(parsed)
+                self.entered_bodies.append(parsed)
             if self.current.type == TokType.KEYWORD_MATCH:
                 parsed = self.parse_match()
                 self.ir.append(parsed)
@@ -90,8 +94,31 @@ class Parser:
         
         return
     
-    def parse_for(self):
-        pass
+    def parse_match_case(self):
+        if self.current.type == TokType.KEYWORD_DEFAULT:
+            return self.get_ir_node("MatchCase", expr=None)
+        self.next() # skip case keyword
+        expr = []
+        while self.current.type != TokType.LBODY:
+            expr.append(self.current.literal)
+            self.next()
+        return self.get_ir_node("MatchCase", expr=expr)
+    
+    def parse_match(self):
+        self.next() # skip match keyword
+        self.expect(TokType.LPAREN) # skip (
+        expr = []
+        brace = 1
+        while brace > 0:
+            expr.append(self.current.literal)
+            self.next()
+            if self.current.type == TokType.LPAREN:
+                brace += 1
+            if self.current.type == TokType.RPAREN:
+                brace -= 1
+        self.expect(TokType.RPAREN) # skip )
+        self.expect(TokType.LBODY) # skip {
+        return self.get_ir_node("Match", expr=expr)
     
     def parse_for(self):
         self.next() # skip for keyword
@@ -366,7 +393,7 @@ class Parser:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error("unexpected eof")
+            error(f"unexpected eof at {self.pos}, {self.current.literal}")
     
     def expect(self, type):
         if self.pos < len(self.tokens) and self.current.type == type:

@@ -21,9 +21,10 @@ def split_src(src, delims):
         res.append(src[bol:])
         
     res = [i for i in res if i not in " "]
-    
     for i, part in enumerate(res):
-        if (part in '=<>|&~!+-*/%^' and res[i+1] == '=') or (part in "+-" and res[i+1] in "+-"):
+        if (part in '=<>|&~!+-*/%^' and res[i+1] == '=') or \
+           (part in "+-" and res[i+1] in "+-") or \
+           (part in "|&" and res[i+1] in "|&"):
             res[i] += res[i+1]
             del res[i + 1]
             
