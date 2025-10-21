@@ -7,13 +7,14 @@
 }
 
 fn main() : int {
-    var number : int = 6;
-    match (number) {
-        case 6 || 8 {
-            printf("number is 6 or 8\n");
-        }
-        default {
-            printf("idk\n");
+    for (i : int = 0; i < 30; ++i) {
+        match (i) {
+            case 10 || 15 || 20 {
+                printf("daaa\n");
+            }
+            default {
+                printf("%d\n", sum(i, i+5));
+            }
         }
     }
 }
