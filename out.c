@@ -3,4 +3,4 @@
  int sum ( int a , int b ) { 
  return a + b ; 
  } 
-  int main ( ) { for ( int i = 0 ; i < 30 ; ++ i ) { switch ( i ) { case 10 : case 15 : case 20 : { printf ( "daaa\n" ) ; break ; } default : { printf ( "%d\n" , sum ( i , i + 5 ) ) ; break ; } } } }
+  typedef struct { int a ; int b ; } Some ; int main ( ) { Some test = { 5 , 8 } ; printf ( "%d\n" , sum ( test . a , test . b ) ) ; }
