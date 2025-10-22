@@ -29,8 +29,8 @@ class CodeGen:
                 self.output.append(f"}} {node[1]["name"]}")
                 self.output.append(';')
             case "MatchCase":
-                if node[1]["expr"] != None:
-                    expr = [i for i in node[1]["expr"] if i != "||"]
+                if node[1]["expr"] != None: # TODO: refactor this line
+                    expr = [i for i in node[1]["expr"] if i != "||"] # <-
                     for i in expr:
                         self.output.append("case")
                         self.output.append(i)
@@ -211,7 +211,7 @@ if __name__ == "__main__":
             
     with open(f"{args.f}.c", "w") as f:
         f.write(' '.join(gen.output))
-
+        
     if args.compiler: # TODO: refactor this block
         compile_cmd = args.compiler + f" {args.f}.c" + f" -o {args.o}" if args.o else ""
     else:
