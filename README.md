@@ -10,6 +10,7 @@ fn main() : int {
 }
 ```
 
-### Crest is a simple language written in Python that compiles into C lang, so many features from C come to this language
+### Crest is a simple language written in Python that compiles into C lang
+## it brings many features from C
 
 See examples in `examples/`
