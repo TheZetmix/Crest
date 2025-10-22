@@ -446,8 +446,10 @@ class Parser:
             error(f"unexpected eof at {self.pos}, {self.current.pos+1}")
     
     def expect(self, type):
+        if self.current.type == TokType.NEWLINE:
+            return
         if self.pos < len(self.tokens) and self.current.type == type:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error(f"expected {type}, got {self.current.literal}, line {self.current.pos+1}")
+            error(f"expected {type}, got {repr(self.current.literal)}, line {self.current.pos+1}")
