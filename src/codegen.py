@@ -194,8 +194,11 @@ if __name__ == "__main__":
     arg_parser.add_argument("--debug",  "-d", action="store_true")
     arg_parser.add_argument("--compiler")
     args = arg_parser.parse_args()
-    
-    file = open(args.file, "r").read()
+
+    try:
+        file = open(args.file, "r").read()
+    except FileNotFoundError:
+        error(f"{args.file} not found")
     
     lexer = Lexer(file, args.file)
     lexer.make_all_tokens()
