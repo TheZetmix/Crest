@@ -101,7 +101,6 @@ class Parser:
                 parent = self.entered_bodies.pop()
                 self.ir.append(self.get_ir_node("BodyExit", parent=parent))
             self.next()
-        
         return
     
     def parse_struct(self):
@@ -185,7 +184,9 @@ class Parser:
                 string = ""
                 if self.current.type == TokType.STRING_LITERAL:
                     string = self.current.literal[1:-1]
-                elif self.current.type == TokType.LBODY:
+                elif self.current.type == TokType.LBODY or \
+                     (self.peek().type == TokType.LBODY):
+                    self.expect(TokType.LBODY)
                     self.next()
                     brace = 1
                     while brace > 0:
@@ -204,8 +205,9 @@ class Parser:
                 libs = []
                 if self.current.type == TokType.STRING_LITERAL:
                     string = self.current.literal
-                elif self.current.type == TokType.LBODY:
-                    self.next()
+                elif self.current.type == TokType.LBODY or \
+                     (self.peek().type == TokType.LBODY):
+                    self.expect(TokType.LBODY)
                     libs = []
                     while self.current.type != TokType.RBODY:
                         libs.append(self.current.literal)
