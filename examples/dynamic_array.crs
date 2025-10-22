@@ -34,7 +34,6 @@ fn main() : int {
     append(&arr, 20);
     append(&arr, 1490);
     
-    for (i : int = 0; i < 2; ++i) {
-        printf("%d\n", pop(&arr));
-    }
+    printf("%d\n", pop(&arr));
+    printf("%d\n", pop(&arr));
 }
