@@ -205,12 +205,11 @@ class Parser:
                         libs.append(self.current.literal)
                         self.next()
                     self.next()
-                    if libs:
+                    if libs: # PLEASE REFACTOR THIS
                         libs = [i for i in libs if i not in ['\n']]
+                        returned = self.get_ir_node("IncludeC", libs=libs)
                     else:
-                        libs = string
-                    print(libs)
-                returned = self.get_ir_node("IncludeC", libs=libs)
+                        returned = self.get_ir_node("IncludeC", libs=string)
                 self.entered_bodies.append(returned)
             
         return returned
