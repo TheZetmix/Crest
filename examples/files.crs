@@ -3,8 +3,15 @@
     "stdlib.h"
 }
 
-fn main() : int {
-    var fd : *FILE = fopen("./examples/calc.crs", "r");
+fn main(args : int, argv : **char) : int {
+    var filename : *char;
+    if argc > 0 {
+        filename = args[1];
+    } else {
+        printf("file didnt provided\n");
+        exit(0);
+    }
+    var fd : *FILE = fopen(filename, "r");
     if !fd {
         printf("cant open file\n");
         exit(0);
