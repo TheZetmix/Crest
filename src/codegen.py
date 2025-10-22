@@ -1,6 +1,7 @@
 from parser import *
 from lexer  import *
 from token  import *
+import argparse
 import os
 
 def tohex(value):
@@ -183,22 +184,38 @@ class CodeGen:
             
             
 if __name__ == "__main__":
-    file = open(sys.argv[1], "r").read()
-    da_lexa = Lexer(file, sys.argv[1])
-    da_lexa.make_all_tokens()
-    fucking_parser = Parser(da_lexa)
-    gen = CodeGen(fucking_parser)
-    print("ir:")
-    for i in gen.ir:
-        node_name = i[0]
-        print(node_name, " " * (12 - len(node_name)), i[1])
-    print("generated:")
-    output = [i if i not in ';{}' else f"{i}\n" for i in gen.output ]
-    for i in output:
-        print(i, end=' ' if '\n' not in i else '')
-        
-    with open("out.c", "w") as f:
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument("-f", required=True)
+    arg_parser.add_argument("-o")
+    arg_parser.add_argument("-l", action="append")
+    arg_parser.add_argument("-d", action="store_true")
+    args = arg_parser.parse_args()
+    
+    file = open(args.f, "r").read()
+    
+    lexer = Lexer(file, args.f)
+    lexer.make_all_tokens()
+    parser = Parser(lexer)
+    gen = CodeGen(parser)
+    if args.d:
+        print(args)
+        print("ir:")
+        for i in gen.ir:
+            node_name = i[0]
+            print(node_name, " " * (12 - len(node_name)), i[1])
+        print("generated:")
+        output = [i if i not in ';{}' else f"{i}\n" for i in gen.output ]
+        for i in output:
+            print(i, end=' ' if '\n' not in i else '')
+            
+    with open(f"{args.f}.c", "w") as f:
         f.write(' '.join(gen.output))
-    os.system(f"clang out.c -o out")
-    os.system(f"rm out.c")
+        
+    compile_cmd = f"clang {args.f}.c" + f" -o {args.o}" if args.o else ""
+    if args.l:
+        for i in args.l:
+            compile_cmd += f" -l{i}"
+    if args.d: print(compile_cmd)
+    os.system(compile_cmd)
+    os.system(f"rm {args.f}.c")
     
