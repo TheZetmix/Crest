@@ -175,13 +175,13 @@ class CodeGen:
             case "FuncCall":
                 self.output.append(node[1]["name"])
                 self.output.append('(')
-                for i in node[1]["args"]:
-                    if len(i) > 1:
-                        for j in i:
+                for i, arg in enumerate(node[1]["args"]):
+                    if len(arg) > 1:
+                        for j in arg:
                             self.output.append(j)
                     else:
-                        self.output.append(i[0])
-                    if i != node[1]["args"][-1]:
+                        self.output.append(arg[0])
+                    if i != len(node[1]["args"])-1:
                         self.output.append(',')
                 self.output.append(')')
                 self.output.append(';')
