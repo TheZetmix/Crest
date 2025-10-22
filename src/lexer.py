@@ -25,10 +25,11 @@ def split_src(src, delims):
         if (part in '=<>|&~!+-*/%^' and res[i+1] == '=') or \
            (part in "+-" and res[i+1] in "+-") or \
            (part in "|&" and res[i+1] in "|&") or \
-           (part in "-=" and res[i+1] == ">"):
+           (part in "-=" and res[i+1] == ">") or \
+           (part == "/"  and res[i+1] == "/"): # TODO: implement multiline comments
             res[i] += res[i+1]
             del res[i + 1]
-            
+    
     return res
 
 def get_part_type(part):
@@ -93,6 +94,18 @@ class Lexer:
         self.filename = filename
         self.delims = " .,:;(){}[]#\"\'+-*/%=!&|<>^~?\n"
         self.src_split = split_src(src, self.delims)
+        
+        # filter src
+        new_src = []
+        comment = False
+        for i in self.src_split:
+            if i in ["//"]:
+                comment = True
+            elif i in ["\n"]:
+                comment = False
+            if not comment:
+                new_src.append(i)
+        self.src_split = new_src
         
     def make_all_tokens(self):
         pos = 0

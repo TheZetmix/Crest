@@ -443,7 +443,7 @@ class Parser:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error(f"unexpected eof at {self.pos}, {self.current.literal}")
+            error(f"unexpected eof at {self.pos}, {self.current.pos+1}")
     
     def expect(self, type):
         if self.pos < len(self.tokens) and self.current.type == type:
