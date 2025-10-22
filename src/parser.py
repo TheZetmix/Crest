@@ -119,8 +119,7 @@ class Parser:
                 var_name = self.current.literal
                 self.expect(TokType.ID)
                 self.expect(TokType.COLON)
-                type = self.current.literal
-                self.expect(TokType.ID)
+                type = self.parse_type()
                 self.expect(TokType.SEMICOLON)
                 fields.append((var_name, type))
         self.next()
