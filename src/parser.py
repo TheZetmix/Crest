@@ -365,7 +365,8 @@ class Parser:
     def parse_expr(self, *break_types):
         expr = []
         while self.current.type not in break_types:
-            expr.append(self.current.literal)
+            if self.current.type not in [TokType.NEWLINE]: # 'in' for future
+                expr.append(self.current.literal)
             self.next()
         return expr
     
