@@ -76,7 +76,7 @@ def get_keyword_token(keyword: str):
         'if'       : TokType.KEYWORD_IF,
         'register' : TokType.KEYWORD_REGISTER,
         'return'   : TokType.KEYWORD_RETURN,
-        'static'   : TokType.KEYWORD_STATIC,
+        'dynamic'  : TokType.KEYWORD_DYNAMIC,
         'struct'   : TokType.KEYWORD_STRUCT,
         'match'    : TokType.KEYWORD_MATCH,
         'typedef'  : TokType.KEYWORD_TYPEDEF,
