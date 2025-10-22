@@ -84,6 +84,7 @@ def get_keyword_token(keyword: str):
         'volatile' : TokType.KEYWORD_VOLATILE,
         'while'    : TokType.KEYWORD_WHILE,
         'foreach'  : TokType.KEYWORD_FOREACH,
+        'using'    : TokType.KEYWORD_USING,
     }
     return keyword_to_toktype.get(keyword)
 
