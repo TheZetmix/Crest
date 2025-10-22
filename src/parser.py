@@ -12,7 +12,6 @@ class Parser:
         self.pos = 0
         self.current = self.tokens[self.pos]
         self.entered_bodies = []
-        self.vars = []
         
         while self.current.type != TokType.EOF:
             if self.current.type == TokType.KEYWORD_CONTINUE:
@@ -93,7 +92,6 @@ class Parser:
                     self.ir.append(parsed)
             if self.current.type == TokType.KEYWORD_VAR:
                 parsed = self.parse_vardef()
-                self.vars.append(parsed[1]["name"])
                 self.ir.append(parsed)
             if self.current.type == TokType.KEYWORD_FN:
                 parsed = self.parse_funcdef()
