@@ -205,7 +205,12 @@ class Parser:
                         libs.append(self.current.literal)
                         self.next()
                     self.next()
-                returned = self.get_ir_node("IncludeC", libs=[(i for i in libs if i not in ['\n']) if libs else string])
+                    if libs:
+                        libs = [i for i in libs if i not in ['\n']]
+                    else:
+                        libs = string
+                    print(libs)
+                returned = self.get_ir_node("IncludeC", libs=libs)
                 self.entered_bodies.append(returned)
             
         return returned
