@@ -15,6 +15,14 @@ class Parser:
         self.vars = []
         
         while self.current.type != TokType.EOF:
+            if self.current.type == TokType.KEYWORD_CONTINUE:
+                self.next()
+                self.expect(TokType.SEMICOLON)
+                self.ir.append(self.get_ir_node("Continue"))
+            if self.current.type == TokType.KEYWORD_BREAK:
+                self.next()
+                self.expect(TokType.SEMICOLON)
+                self.ir.append(self.get_ir_node("Break"))
             if self.current.type == TokType.KEYWORD_STRUCT:
                 parsed = self.parse_struct()
                 self.ir.append(parsed)
@@ -446,10 +454,11 @@ class Parser:
             error(f"unexpected eof at {self.pos}, {self.current.pos+1}")
     
     def expect(self, type):
-        if self.current.type == TokType.NEWLINE:
+        if self.current.type == TokType.NEWLINE and not \
+           (type == TokType.SEMICOLON):
             return
         if self.pos < len(self.tokens) and self.current.type == type:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error(f"expected {type}, got {repr(self.current.literal)}, line {self.current.pos+1}")
+            error(f"expected {type}, got {repr(self.current.literal)}, line {self.current.pos}")

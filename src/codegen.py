@@ -19,6 +19,10 @@ class CodeGen:
         
     def gen_from_node(self, node):
         match node[0]:
+            case "Continue":
+                self.output.append("continue;")
+            case "Break":
+                self.output.append("break;")
             case "StructDef":
                 self.output.append("typedef struct")
                 self.output.append("{")
