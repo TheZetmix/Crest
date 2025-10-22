@@ -189,20 +189,20 @@ class CodeGen:
             
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("-f", required=True)
-    arg_parser.add_argument("-o")
-    arg_parser.add_argument("-l", action="append")
-    arg_parser.add_argument("-d", action="store_true")
+    arg_parser.add_argument("--file",   "-f", required=True)
+    arg_parser.add_argument("--output", "-o")
+    arg_parser.add_argument("--link",   "-l", action="append")
+    arg_parser.add_argument("--debug",  "-d", action="store_true")
     arg_parser.add_argument("--compiler")
     args = arg_parser.parse_args()
     
-    file = open(args.f, "r").read()
+    file = open(args.file, "r").read()
     
-    lexer = Lexer(file, args.f)
+    lexer = Lexer(file, args.file)
     lexer.make_all_tokens()
     parser = Parser(lexer)
     gen = CodeGen(parser)
-    if args.d:
+    if args.debug:
         print(args)
         print("ir:")
         for i in gen.ir:
@@ -213,17 +213,17 @@ if __name__ == "__main__":
         for i in output:
             print(i, end=' ' if '\n' not in i else '')
             
-    with open(f"{args.f}.c", "w") as f:
+    with open(f"{args.file}.c", "w") as f:
         f.write(' '.join(gen.output))
         
     if args.compiler: # TODO: refactor this block
-        compile_cmd = args.compiler + f" {args.f}.c" + f" -o {args.o}" if args.o else ""
+        compile_cmd = args.compiler + f" {args.file}.c" + f" -o {args.output}" if args.output else ""
     else:
-        compile_cmd = "clang" + f" {args.f}.c" + f" -o {args.o}" if args.o else ""
-    if args.l:
-        for i in args.l:
+        compile_cmd = "clang" + f" {args.file}.c" + f" -o {args.output}" if args.output else ""
+    if args.link:
+        for i in args.link:
             compile_cmd += f" -l{i}"
-    if args.d: print(compile_cmd)
+    if args.debug: print(compile_cmd)
     os.system(compile_cmd)
-    os.system(f"rm {args.f}.c")
+    os.system(f"rm {args.file}.c")
     
