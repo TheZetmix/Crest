@@ -119,17 +119,7 @@ class Parser:
     
     def parse_match(self):
         self.next() # skip match keyword
-        self.expect(TokType.LPAREN) # skip (
-        expr = []
-        brace = 1
-        while brace > 0:
-            expr.append(self.current.literal)
-            self.next()
-            if self.current.type == TokType.LPAREN:
-                brace += 1
-            if self.current.type == TokType.RPAREN:
-                brace -= 1
-        self.expect(TokType.RPAREN) # skip )
+        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("Match", expr=expr)
     
@@ -272,34 +262,14 @@ class Parser:
     
     def parse_while(self):
         self.next() # skip 'while' keyword
-        self.expect(TokType.LPAREN) # skip (
-        expr = []
-        brace = 1
-        while brace > 0:
-            expr.append(self.current.literal)
-            self.next()
-            if self.current.type == TokType.LPAREN:
-                brace += 1
-            if self.current.type == TokType.RPAREN:
-                brace -= 1
-        self.expect(TokType.RPAREN) # skip )
+        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("While", expr=expr)
     
     def parse_elseif(self):
         self.next() # skip 'else' keyword
         self.next() # skip 'if' keyword
-        self.expect(TokType.LPAREN) # skip (
-        expr = []
-        brace = 1
-        while brace > 0:
-            expr.append(self.current.literal)
-            self.next()
-            if self.current.type == TokType.LPAREN:
-                brace += 1
-            if self.current.type == TokType.RPAREN:
-                brace -= 1
-        self.expect(TokType.RPAREN) # skip )
+        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("ElseIfStatement", expr=expr)
     
@@ -310,17 +280,7 @@ class Parser:
         
     def parse_if(self):
         self.next() # skip 'if' keyword
-        self.expect(TokType.LPAREN) # skip (
-        expr = []
-        brace = 1
-        while brace > 0:
-            expr.append(self.current.literal)
-            self.next()
-            if self.current.type == TokType.LPAREN:
-                brace += 1
-            if self.current.type == TokType.RPAREN:
-                brace -= 1
-        self.expect(TokType.RPAREN) # skip )
+        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("IfStatement", expr=expr)
     
@@ -446,4 +406,4 @@ class Parser:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error(f"expected {type}, got {repr(self.current.literal)}, line {self.current.pos}")
+            error(f"expected {type}, got {repr(self.current.literal)}, line {self.current.pos+1}")
