@@ -3,10 +3,10 @@
     "stdlib.h"
 }
 
-fn main(args : int, argv : **char) : int {
+fn main(argc : int, argv : **char) : int {
     var filename : *char;
     if argc > 0 {
-        filename = args[1];
+        filename = argv[1];
     } else {
         printf("file didnt provided\n");
         exit(0);
