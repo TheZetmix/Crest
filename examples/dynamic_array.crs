@@ -1,0 +1,40 @@
+[!include] {
+    "stdio.h"
+    "stdlib.h"
+}
+
+struct Array {
+    items : *int;
+    size : int;
+    cap : int;
+}
+
+fn new_arr() : Array {
+    return (Array){.size=0, .cap=0};
+}
+
+fn append(arr : *Array, value : int) : void {
+    if (arr->size + 1 > arr->cap) {
+        arr->cap += 16;
+        arr->items = realloc(arr->items, arr->cap * sizeof(int));
+    }
+    *(arr->items+arr->size) = value;
+    arr->size++;
+}
+
+fn pop(arr : *Array) : int {
+    arr->size--;
+    return *(arr->items+arr->size);
+}
+
+fn main() : int {
+    var arr : Array = new_arr();
+    append(&arr, 10);
+    append(&arr, 15183);
+    append(&arr, 20);
+    append(&arr, 1490);
+    
+    for (i : int = 0; i < 2; ++i) {
+        printf("%d\n", pop(&arr));
+    }
+}
