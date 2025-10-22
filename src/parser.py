@@ -110,15 +110,12 @@ class Parser:
         if self.current.type == TokType.KEYWORD_DEFAULT:
             return self.get_ir_node("MatchCase", expr=None)
         self.next() # skip case keyword
-        expr = []
-        while self.current.type != TokType.LBODY:
-            expr.append(self.current.literal)
-            self.next()
+        expr = self.parse_expr(TokType.LBODY)
         return self.get_ir_node("MatchCase", expr=expr)
     
     def parse_match(self):
         self.next() # skip match keyword
-        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
+        expr = self.parse_expr(TokType.LBODY)
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("Match", expr=expr)
     
@@ -131,9 +128,9 @@ class Parser:
         iterator_type = self.current.literal
         self.expect(TokType.ID) # skip type
         self.expect(TokType.ASSIGN) # skip =
-        assign_expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+        assign_expr = self.parse_expr(TokType.SEMICOLON)
         self.next() # skip first ;
-        expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+        expr = self.parse_expr(TokType.SEMICOLON)
         self.next() # skip second ;
         iter_modification = []
         brace = 1
@@ -220,7 +217,7 @@ class Parser:
         op = self.current.literal
         self.next()
         if op not in ["++", "--"]:
-            rvalue = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+            rvalue = self.parse_expr(TokType.SEMICOLON)
         else:
             rvalue = None
         
@@ -249,26 +246,17 @@ class Parser:
         
         self.expect(TokType.RPAREN) # skip )
         return self.get_ir_node("Foreach", iterator=new_args[0][0], type=new_args[0][1], array=new_args[1][0])
-        
-    def parse_directive(self):
-        directive = self.current.literal
-        self.next() # skip directive
-        content = []
-        while self.current.type != TokType.NEWLINE:
-            content.append(self.current.literal)
-            self.next()
-        return self.get_ir_node("Directive", id=directive, content=content)
     
     def parse_while(self):
         self.next() # skip 'while' keyword
-        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
+        expr = self.parse_expr(TokType.LBODY)
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("While", expr=expr)
     
     def parse_elseif(self):
         self.next() # skip 'else' keyword
         self.next() # skip 'if' keyword
-        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
+        expr = self.parse_expr(TokType.LBODY)
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("ElseIfStatement", expr=expr)
     
@@ -279,67 +267,67 @@ class Parser:
         
     def parse_if(self):
         self.next() # skip 'if' keyword
-        expr = [i.literal for i in self.parse_until(TokType.LBODY)]
+        expr = self.parse_expr(TokType.LBODY)
         self.expect(TokType.LBODY) # skip {
         return self.get_ir_node("IfStatement", expr=expr)
     
     def parse_return(self):
         self.next() # skip 'return' keyword
-        expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+        expr = self.parse_expr(TokType.SEMICOLON)
         return self.get_ir_node("Return", expr=expr)
     
     def parse_funccall(self):
         name = self.current.literal
         self.expect(TokType.ID) # skip name
         self.expect(TokType.LPAREN) # skip (
-        if self.current.type == TokType.RPAREN:
+        if self.current.type == TokType.RPAREN: # if there is no args at all
             return self.get_ir_node("FuncCall", name=name, args=[])
-        args = []
-        bol = self.pos
-        # get arguments as list of expressions
-        brace = 1
-        while brace > 0: # self.current.type != TokType.RPAREN:
-            if self.current.type == TokType.COMMA:
-                args.append([i.literal for i in self.tokens[bol:self.pos]])
-                bol = self.pos + 1
-            self.next()
+        if self.peek().type == TokType.RPAREN: # if there is only one arg
+            expr = self.parse_expr(TokType.RPAREN)
+            return self.get_ir_node("FuncCall", name=name, args=[expr])
+        
+        args, cur = [], []
+        brace = 0
+        while not (self.current.type == TokType.RPAREN and brace == 0):
             if self.current.type == TokType.LPAREN:
                 brace += 1
             if self.current.type == TokType.RPAREN:
+                if brace == 0:
+                    break
                 brace -= 1
-        
-        args.append([i.literal for i in self.tokens[bol:self.pos]])
+            if self.current.type == TokType.COMMA and brace == 0:
+                args.append(cur)
+                cur = []
+                self.next()
+                continue
+            cur.append(self.current.literal)
+            self.next()
+        if cur: args.append(cur)
         return self.get_ir_node("FuncCall", name=name, args=args)
     
     def parse_funcdef(self):
         self.next() # skip 'fn' keyword
         name = self.current.literal
-        self.expect(TokType.ID)     # skip id
+        self.expect(TokType.ID)
+        if self.current.type == TokType.COLON:
+            return self.get_ir_node("FuncDef", name=name, args=[], type="")
         self.expect(TokType.LPAREN)
-        args = []
-        to_append = []
-        for i in self.parse_until(TokType.RPAREN):
-            if i.type == TokType.COMMA:
-                args.append(to_append)
-                to_append = []
-            else:
-                to_append.append(i.literal)
-        if to_append:
-            args.append(to_append)
-        new_args = []
-        for i in args:
-            arg_name = i[0]
-            arg_type = i[2]
-            if arg_type == '*':
-                arg_type = i[3] + arg_type
-            new_args.append(self.get_ir_node("Arg", name=arg_name, type=arg_type))
         
-        self.expect(TokType.RPAREN) # skip )
-        self.expect(TokType.COLON)  # skip colon
-        type = self.parse_type()
-        self.expect(TokType.LBODY) # skip {
-        return self.get_ir_node("FuncDef", name=name, args=new_args, type=type)
-    
+        args = []
+        
+        while self.current.type != TokType.RPAREN:
+            arg_name = self.current.literal
+            self.expect(TokType.ID)
+            self.expect(TokType.COLON)
+            type = self.parse_type()
+            if self.current.type != TokType.RPAREN:
+                self.expect(TokType.COMMA)
+            args.append(self.get_ir_node("Arg", name=arg_name, type=type))
+        self.expect(TokType.RPAREN)
+        self.expect(TokType.COLON)
+        func_type = self.parse_type()
+        return self.get_ir_node("FuncDef", name=name, args=args, type=func_type)
+        
     def parse_vardef(self):
         self.next() # skip 'var' keyword
         name = self.current.literal
@@ -353,12 +341,33 @@ class Parser:
             expr = None
         else:
             self.expect(TokType.ASSIGN) # skip assign
-            expr = [i.literal for i in self.parse_until(TokType.SEMICOLON)]
+            expr = self.parse_expr(TokType.SEMICOLON)
             self.expect(TokType.SEMICOLON)
         return self.get_ir_node("VarDef", name=name, expr=expr, type=type)
     
     def get_ir_node(self, node_type, **kwargs):
         return (node_type, kwargs)
+    
+    def parse_expr_brace(self, break_type):
+        expr = []
+        brace = 1
+        while brace > 0:
+            if self.current.type == break_type:
+                break
+            if self.current.type == TokType.LPAREN:
+                brace += 1
+            if self.current.type == TokType.RPAREN:
+                brace -= 1
+            expr.append(self.current.literal)
+            self.next()
+        return expr
+    
+    def parse_expr(self, *break_types):
+        expr = []
+        while self.current.type not in break_types:
+            expr.append(self.current.literal)
+            self.next()
+        return expr
     
     def parse_until(self, end_type):
         res = []
@@ -377,12 +386,12 @@ class Parser:
             self.expect(TokType.RBRACE)
             type += '[]'
         elif self.current.type == TokType.MULTIPLY:
-            self.next()
-            type = self.current.literal + type
+            while self.current.type != TokType.ID:
+                self.next()
+                type = self.current.literal + type
             self.next()
         else:
             self.expect(TokType.ID) # skip type
-        
         return type
     
     def peek(self, n=1):
@@ -396,7 +405,7 @@ class Parser:
             self.current = self.tokens[self.pos]
         else:
             error(f"unexpected eof at {self.pos}, {self.current.pos+1}")
-    
+        
     def expect(self, type):
         if self.current.type == TokType.NEWLINE and not \
            (type == TokType.SEMICOLON):
