@@ -7,7 +7,6 @@ class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.tokens = lexer.tokens
-        
         self.ir = []
         self.pos = 0
         self.current = self.tokens[self.pos]
