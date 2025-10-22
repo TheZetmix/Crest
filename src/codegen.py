@@ -189,6 +189,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-o")
     arg_parser.add_argument("-l", action="append")
     arg_parser.add_argument("-d", action="store_true")
+    arg_parser.add_argument("--compiler")
     args = arg_parser.parse_args()
     
     file = open(args.f, "r").read()
@@ -210,8 +211,11 @@ if __name__ == "__main__":
             
     with open(f"{args.f}.c", "w") as f:
         f.write(' '.join(gen.output))
-        
-    compile_cmd = f"clang {args.f}.c" + f" -o {args.o}" if args.o else ""
+
+    if args.compiler: # TODO: refactor this block
+        compile_cmd = args.compiler + f" {args.f}.c" + f" -o {args.o}" if args.o else ""
+    else:
+        compile_cmd = "clang" + f" {args.f}.c" + f" -o {args.o}" if args.o else ""
     if args.l:
         for i in args.l:
             compile_cmd += f" -l{i}"
