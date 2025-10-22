@@ -176,6 +176,7 @@ class Parser:
             self.next()
         return self.get_ir_node("For", iter=(iterator, iterator_type), assign_expr=assign_expr, expr=expr, iter_modification=iter_modification)
     
+    # this piece of shit totally sucks
     def parse_inline_c(self):
         self.next() # skip [
         self.expect(TokType.NOT) # skip !
@@ -198,7 +199,6 @@ class Parser:
                             string += self.current.literal + " "
                         self.next()
                     returned = self.get_ir_node("InlineC", string=string)
-                    self.entered_bodies.append(returned)
             case 'include':
                 self.expect(TokType.ID) # skip include
                 self.expect(TokType.RBRACE) # skip ]
@@ -218,7 +218,6 @@ class Parser:
                         returned = self.get_ir_node("IncludeC", libs=libs)
                     else:
                         returned = self.get_ir_node("IncludeC", libs=string)
-                self.entered_bodies.append(returned)
             
         return returned
     
@@ -457,7 +456,7 @@ class Parser:
     def expect(self, type):
         if self.current.type == TokType.NEWLINE and not \
            (type == TokType.SEMICOLON):
-            return
+            self.next()
         if self.pos < len(self.tokens) and self.current.type == type:
             self.pos += 1
             self.current = self.tokens[self.pos]
