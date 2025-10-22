@@ -7,7 +7,7 @@
     int global_a = 10;
     
     void print_global_a() {
-        printf("%d\n", global_a);
+        printf("Global: %d\n", global_a);
     }
 }
 
@@ -17,5 +17,5 @@ fn main() : int {
         int x = 10;
         int y = x - 14;
     }
-    printf("%d\n", x + y);
+    printf("Local in main: %d\n", x + y);
 }
