@@ -1,11 +1,16 @@
 [!include] {
     "stdio.h"
+    "stdlib.h"
 }
 
 fn main() : int {
-    var i : int = 0;
-    while i < 100 {
-        printf("%d\n", i);
-        i++;
+    var fd : *FILE = fopen("./examples/calc.crs", "r");
+    if !fd {
+        printf("cant open file\n");
+        exit(0);
+    }
+    var c : int;
+    while (c = fgetc(fd)) != EOF {
+        printf("%c", c);
     }
 }
