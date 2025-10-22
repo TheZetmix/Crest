@@ -1,4 +1,8 @@
-# Crest
+## Crest
+
+**Crest** is a simple programming language written in Python that compiles to C. It brings many features from C while keeping a simpler syntax.
+
+### Example
 
 ``` c
 [!include] {
@@ -10,7 +14,13 @@ fn main() : int {
 }
 ```
 
-### Crest is a simple language written in Python that compiles into C lang
-#### it brings many features from C
+Check out more examples in the examples/ folder.
 
-See examples in `examples/`
+### About
+
+Crest is designed to be easy to learn, while allowing low-level control through C features.
+
+### License
+
+MIT License
+
