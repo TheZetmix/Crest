@@ -450,4 +450,4 @@ class Parser:
             self.pos += 1
             self.current = self.tokens[self.pos]
         else:
-            error(f"expected {type}, got {self.current.literal}, {self.pos}")
+            error(f"expected {type}, got {self.current.literal}, line {self.current.pos+1}")
