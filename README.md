@@ -1,8 +1,8 @@
 # Crest
 
 ``` c
-[!c] {
-    #include "stdio.h"
+[!include] {
+    "stdio.h"
 }
 
 fn main() : int {
