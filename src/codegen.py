@@ -1,6 +1,7 @@
 from parser import *
 from lexer  import *
 from token  import *
+from preprocess import *
 import argparse
 import os
 
@@ -202,7 +203,12 @@ if __name__ == "__main__":
     
     lexer = Lexer(file, args.file)
     lexer.make_all_tokens()
+    
+    preprocessor = Preprocessor(lexer)
+    lexer = preprocessor.modified_lexer
+    
     parser = Parser(lexer)
+    
     gen = CodeGen(parser)
     if args.debug:
         print(args)
