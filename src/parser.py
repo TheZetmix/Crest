@@ -14,92 +14,77 @@ class Parser:
         self.entered_bodies = []
         
         while self.current.type != TokType.EOF:
-            if self.current.type == TokType.KEYWORD_CONTINUE:
-                self.next()
-                self.expect(TokType.SEMICOLON)
-                self.ir.append(self.get_ir_node("Continue"))
-            if self.current.type == TokType.KEYWORD_BREAK:
-                self.next()
-                self.expect(TokType.SEMICOLON)
-                self.ir.append(self.get_ir_node("Break"))
-            if self.current.type == TokType.KEYWORD_STRUCT:
-                parsed = self.parse_struct()
-                self.ir.append(parsed)
-            if self.current.type in [TokType.KEYWORD_CASE, TokType.KEYWORD_DEFAULT]:
-                parsed = self.parse_match_case()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.KEYWORD_MATCH:
-                parsed = self.parse_match()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.KEYWORD_FOR:
-                parsed = self.parse_for()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.LBRACE:
-                if self.peek().type == TokType.NOT and \
-                   self.peek(n=2).type == TokType.ID and \
-                   self.peek(n=3).type == TokType.RBRACE:
-                    parsed = self.parse_inline_c()
+            match self.current.type:
+                case TokType.KEYWORD_CONTINUE:
+                    self.next()
+                    self.expect(TokType.SEMICOLON)
+                    self.ir.append(self.get_ir_node("Continue"))
+                case TokType.KEYWORD_BREAK:
+                    self.next()
+                    self.expect(TokType.SEMICOLON)
+                    self.ir.append(self.get_ir_node("Break"))
+                case TokType.KEYWORD_STRUCT:
+                    parsed = self.parse_struct()
                     self.ir.append(parsed)
-            if self.current.type == TokType.KEYWORD_FOREACH:
-                parsed = self.parse_foreach()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.DIRECTIVE:
-                parsed = self.parse_directive()
-                self.ir.append(parsed)
-            if self.current.type == TokType.KEYWORD_WHILE:
-                parsed = self.parse_while()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.KEYWORD_IF:
-                parsed = self.parse_if()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.KEYWORD_ELSE:
-                if self.peek().type == TokType.KEYWORD_IF:
-                    parsed = self.parse_elseif()
+                case TokType.KEYWORD_CASE | TokType.KEYWORD_DEFAULT:
+                    parsed = self.parse_match_case()
                     self.ir.append(parsed)
                     self.entered_bodies.append(parsed)
-                else:
-                    parsed = self.parse_else()
+                case TokType.KEYWORD_MATCH:
+                    parsed = self.parse_match()
                     self.ir.append(parsed)
                     self.entered_bodies.append(parsed)
-            if self.current.type == TokType.KEYWORD_RETURN:
-                parsed = self.parse_return()
-                self.ir.append(parsed)
-            if self.current.type in [
-                        TokType.ASSIGN,
-                        TokType.PLUS_ASSIGN,
-                        TokType.MINUS_ASSIGN,
-                        TokType.MULTIPLY_ASSIGN,
-                        TokType.DIVIDE_ASSIGN,
-                        TokType.MODULO_ASSIGN,
-                        TokType.AND_ASSIGN,
-                        TokType.OR_ASSIGN,
-                        TokType.XOR_ASSIGN,
-                        TokType.SHIFT_LEFT,
-                        TokType.SHIFT_RIGHT,
-                        TokType.INCREMENT,
-                        TokType.DECREMENT]:
-               parsed = self.parse_assign_expression();
-               self.ir.append(parsed)
-            if self.current.type == TokType.ID:
-                if self.peek().type == TokType.LPAREN:
-                    parsed = self.parse_funccall()
+                case TokType.KEYWORD_FOR:
+                    parsed = self.parse_for()
                     self.ir.append(parsed)
-            if self.current.type == TokType.KEYWORD_VAR:
-                parsed = self.parse_vardef()
-                self.ir.append(parsed)
-            if self.current.type == TokType.KEYWORD_FN:
-                parsed = self.parse_funcdef()
-                self.ir.append(parsed)
-                self.entered_bodies.append(parsed)
-            if self.current.type == TokType.RBODY:
-                parent = self.entered_bodies.pop()
-                self.ir.append(self.get_ir_node("BodyExit", parent=parent))
+                    self.entered_bodies.append(parsed)
+                case TokType.LBRACE:
+                    if self.peek().type == TokType.NOT and \
+                       self.peek(n=2).type == TokType.ID and \
+                       self.peek(n=3).type == TokType.RBRACE:
+                        parsed = self.parse_inline_c()
+                        self.ir.append(parsed)
+                case TokType.KEYWORD_FOREACH:
+                    parsed = self.parse_foreach()
+                    self.ir.append(parsed)
+                    self.entered_bodies.append(parsed)
+                case TokType.KEYWORD_WHILE:
+                    parsed = self.parse_while()
+                    self.ir.append(parsed)
+                    self.entered_bodies.append(parsed)
+                case TokType.KEYWORD_IF:
+                    parsed = self.parse_if()
+                    self.ir.append(parsed)
+                    self.entered_bodies.append(parsed)
+                case TokType.KEYWORD_ELSE:
+                    if self.peek().type == TokType.KEYWORD_IF:
+                        parsed = self.parse_elseif()
+                        self.ir.append(parsed)
+                        self.entered_bodies.append(parsed)
+                    else:
+                        parsed = self.parse_else()
+                        self.ir.append(parsed)
+                        self.entered_bodies.append(parsed)
+                case TokType.KEYWORD_RETURN:
+                    parsed = self.parse_return()
+                    self.ir.append(parsed)
+                case TokType.ASSIGN | TokType.PLUS_ASSIGN | TokType.MINUS_ASSIGN | TokType.MULTIPLY_ASSIGN | TokType.DIVIDE_ASSIGN | TokType.MODULO_ASSIGN | TokType.AND_ASSIGN | TokType.OR_ASSIGN | TokType.XOR_ASSIGN | TokType.SHIFT_LEFT | TokType.SHIFT_RIGHT | TokType.INCREMENT | TokType.DECREMENT:
+                    parsed = self.parse_assign_expression();
+                    self.ir.append(parsed)
+                case TokType.ID:
+                    if self.peek().type == TokType.LPAREN:
+                        parsed = self.parse_funccall()
+                        self.ir.append(parsed)
+                case TokType.KEYWORD_VAR:
+                    parsed = self.parse_vardef()
+                    self.ir.append(parsed)
+                case TokType.KEYWORD_FN:
+                    parsed = self.parse_funcdef()
+                    self.ir.append(parsed)
+                    self.entered_bodies.append(parsed)
+                case TokType.RBODY:
+                    parent = self.entered_bodies.pop()
+                    self.ir.append(self.get_ir_node("BodyExit", parent=parent))
             self.next()
         return
     
