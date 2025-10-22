@@ -29,6 +29,7 @@ class Parser:
             if self.current.type == TokType.KEYWORD_FOR:
                 parsed = self.parse_for()
                 self.ir.append(parsed)
+                self.entered_bodies.append(parsed)
             if self.current.type == TokType.LBRACE:
                 if self.peek().type == TokType.NOT and \
                    self.peek(n=2).type == TokType.ID and \
