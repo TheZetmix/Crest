@@ -3,7 +3,7 @@ from enum import Enum, auto
 C_KEYWORDS = {
     'auto', 'break', 'case', 'const', 'continue', 'default',
     'double', 'else', 'enum', 'extern', 'var', 'fn', 'for', 'if',
-    'register', 'return', 'static',
+    'register', 'return', 'dynamic',
     'struct', 'match', 'typedef', 'union', 'volatile', 'while', 'foreach'
 }
 
@@ -24,7 +24,7 @@ class TokType(Enum):
     KEYWORD_IF           = auto()
     KEYWORD_REGISTER     = auto()
     KEYWORD_RETURN       = auto()
-    KEYWORD_STATIC       = auto()
+    KEYWORD_DYNAMIC      = auto()
     KEYWORD_STRUCT       = auto()
     KEYWORD_MATCH        = auto()
     KEYWORD_TYPEDEF      = auto()
