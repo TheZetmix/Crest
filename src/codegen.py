@@ -186,7 +186,6 @@ class CodeGen:
                 self.output.append(')')
                 self.output.append(';')
             
-            
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--file",   "-f", required=True)

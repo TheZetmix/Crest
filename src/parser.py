@@ -180,7 +180,7 @@ class Parser:
         self.next() # skip [
         self.expect(TokType.NOT) # skip !
         match self.current.literal:
-            case 'c':
+            case 'c': # TODO: refactor this block
                 self.expect(TokType.ID) # skip c
                 self.expect(TokType.RBRACE) # skip ]
                 string = ""
@@ -200,7 +200,7 @@ class Parser:
                     returned = self.get_ir_node("InlineC", string=string)
                     self.entered_bodies.append(returned)
             case 'include':
-                self.expect(TokType.ID) # skip c
+                self.expect(TokType.ID) # skip include
                 self.expect(TokType.RBRACE) # skip ]
                 string = ""
                 libs = []
