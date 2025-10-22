@@ -1,0 +1,11 @@
+[!include] {
+    "stdio.h"
+}
+
+fn main() : int {
+    var i : int = 0;
+    while i < 100 {
+        printf("%d\n", i);
+        i++;
+    }
+}

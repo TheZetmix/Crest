@@ -7,14 +7,14 @@ fn main() : int {
     var num1 : int;
     var num2 : int;
     var op : char;
-    while (1) {
+    while 1 {
         printf("first: ");
         scanf("%d", &num1);
         printf("second: ");
         scanf("%d", &num2);
         printf("op: ");
         scanf(" %c", &op);
-        match (op) {
+        match op {
             case '+' {
                 printf("%d\n", num1+num2);
             }
