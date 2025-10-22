@@ -420,6 +420,8 @@ class Parser:
     def parse_until(self, end_type):
         res = []
         while self.current.type != end_type:
+            if self.current.literal in C_KEYWORDS:
+                error(f"unexpected eof at {self.pos}, {self.current.pos+1}")
             res.append(self.current)
             self.next()
         return res
