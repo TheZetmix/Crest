@@ -1,7 +1,11 @@
 [!include] {
     "stdio.h"
-    "stdlib.h"
 }
+// ^^^^^^^^^
+// [!include] are same as
+// [!c] {
+//     #include "stdio.h"
+// }
 
 [!c] {
     int global_a = 10;
