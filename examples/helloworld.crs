@@ -1,5 +1,5 @@
-using std/io;
+using std;
 
 fn main : int {
-    io::println("Hello, World!");
+    std::println("Hello, World!");
 }
