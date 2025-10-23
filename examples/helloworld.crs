@@ -1,7 +1,5 @@
-[!include] {
-    "stdio.h"
-}
+using std/io;
 
-fn main() : int {
-    printf("Hello, World!\n");
+fn main : int {
+    io::println("Hello, World!");
 }
