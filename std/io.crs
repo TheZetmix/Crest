@@ -1,0 +1,7 @@
+[!include] {
+    "stdio.h"
+}
+
+fn println(s : *char) : void {
+    printf("%s\n", s);
+}
