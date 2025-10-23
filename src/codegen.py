@@ -205,11 +205,15 @@ if __name__ == "__main__":
     lexer.make_all_tokens()
     
     preprocessor = Preprocessor(lexer)
-    lexer = preprocessor.modified_lexer
+    lexer.tokens = preprocessor.new_tokens
     
     parser = Parser(lexer)
     
     gen = CodeGen(parser)
+    if args.debug:
+        for i in lexer.tokens:
+            print(i.literal, end=" ")
+    
     if args.debug:
         print(args)
         print("ir:")
