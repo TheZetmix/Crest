@@ -26,6 +26,7 @@ def split_src(src, delims):
            (part in "+-" and res[i+1] in "+-") or \
            (part in "|&" and res[i+1] in "|&") or \
            (part in "-=" and res[i+1] == ">") or \
+           (part == ":"  and res[i+1] == ":") or \
            (part == "/"  and res[i+1] == "/"): # TODO: implement multiline comments
             res[i] += res[i+1]
             del res[i + 1]
