@@ -7,6 +7,7 @@ class Preprocessor:
     def __init__(self, lexer, included_files=None):
         self.new_tokens = lexer.tokens
         self.pos = 0
+        self.lexer = lexer
         self.current = self.new_tokens[self.pos]
         
         self.included = included_files if included_files else []
@@ -25,7 +26,7 @@ class Preprocessor:
         start_pos = self.pos
         self.next()
         
-        include_libname = "./"
+        include_libname = '/'.join((os.getcwd() + "/" + self.lexer.filename).split('/')[:-1]) + '/'
         while self.current.type != TokType.SEMICOLON:
             include_libname += self.current.literal
             self.next()
