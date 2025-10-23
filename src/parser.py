@@ -310,7 +310,9 @@ class Parser:
         name = self.current.literal
         self.expect(TokType.ID)
         if self.current.type == TokType.COLON:
-            return self.get_ir_node("FuncDef", name=name, args=[], type="")
+            self.expect(TokType.COLON)
+            func_type = self.parse_type()
+            return self.get_ir_node("FuncDef", name=name, args=[], type=func_type)
         self.expect(TokType.LPAREN)
         
         args = []
