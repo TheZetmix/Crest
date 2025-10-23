@@ -86,6 +86,7 @@ def get_keyword_token(keyword: str):
         'while'    : TokType.KEYWORD_WHILE,
         'foreach'  : TokType.KEYWORD_FOREACH,
         'using'    : TokType.KEYWORD_USING,
+        'alias'    : TokType.KEYWORD_ALIAS,
     }
     return keyword_to_toktype.get(keyword)
 

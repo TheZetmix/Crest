@@ -4,7 +4,8 @@ C_KEYWORDS = {
     'auto', 'break', 'case', 'const', 'continue', 'default',
     'double', 'else', 'enum', 'extern', 'var', 'fn', 'for', 'if',
     'register', 'return', 'dynamic',
-    'struct', 'match', 'typedef', 'union', 'volatile', 'while', 'foreach', 'using'
+    'struct', 'match', 'typedef', 'union', 'volatile', 'while', 'foreach', 'using',
+    'alias'
 }
 
 class TokType(Enum):
@@ -32,7 +33,8 @@ class TokType(Enum):
     KEYWORD_VOLATILE     = auto()
     KEYWORD_WHILE        = auto()
     KEYWORD_FOREACH      = auto()
-    KEYWORD_USING       = auto()
+    KEYWORD_USING        = auto()
+    KEYWORD_ALIAS        = auto()
     
     ID                   = auto()
     DIRECTIVE            = auto()
