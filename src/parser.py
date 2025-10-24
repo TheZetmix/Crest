@@ -14,6 +14,9 @@ class Parser:
         
         while self.current.type != TokType.EOF:
             match self.current.type:
+                case TokType.KEYWORD_ALIAS:
+                    parsed = self.parse_alias()
+                    self.ir.append(parsed)
                 case TokType.KEYWORD_CONTINUE:
                     self.next()
                     self.expect(TokType.SEMICOLON)
@@ -87,6 +90,13 @@ class Parser:
             self.next()
         return
     
+    def parse_alias(self):
+        self.next() # skip alias keyword
+        from_name = self.parse_expr(TokType.ASSIGN)
+        self.expect(TokType.ASSIGN)
+        to_name = self.parse_expr(TokType.SEMICOLON)
+        return self.get_ir_node("Alias", from_name=from_name, to_name=to_name)
+        
     def parse_struct(self):
         self.next() # skip struct keyword
         name = self.current.literal
