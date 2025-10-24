@@ -213,6 +213,8 @@ class Lexer:
             return Token(TokType.ADDRESS, part, pos)
         elif part == '*':
             return Token(TokType.DEREFERENCE, part, pos)
+        elif part == '::':
+            return Token(TokType.NAMESPACE_DEREF, part, pos)
         elif part == '->':
             return Token(TokType.ARROW, part, pos)
         elif part == '?':
