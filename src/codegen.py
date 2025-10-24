@@ -15,11 +15,20 @@ class CodeGen:
         
         self.output = []
         
+        self.defined_funcs = []
+        
         for i in self.ir:
             self.gen_from_node(i)
         
     def gen_from_node(self, node):
         match node[0]:
+            case "Alias":
+                self.output.append("typedef")
+                for i in node[1]["to_name"]:
+                    self.output.append(i)
+                for i in node[1]["from_name"]:
+                    self.output.append(i)
+                self.output.append(';')
             case "Continue":
                 self.output.append("continue;")
             case "Break":
@@ -152,6 +161,7 @@ class CodeGen:
                     self.output.append(i)
                 self.output.append(";")
             case "FuncDef":
+                self.defined_funcs.append(node[1]["name"])
                 self.output.append(node[1]["type"])
                 self.output.append(node[1]["name"])
                 self.output.append('(')
@@ -212,7 +222,7 @@ if __name__ == "__main__":
     gen = CodeGen(parser)
     if args.debug:
         for i in lexer.tokens:
-            print(i.literal, end=" ")
+            print(i.literal, end=' ')
     
     if args.debug:
         print(args)
@@ -236,6 +246,6 @@ if __name__ == "__main__":
         for i in args.link:
             compile_cmd += f" -l{i}"
     if args.debug: print(compile_cmd)
-    os.system(compile_cmd)
+    # os.system(compile_cmd)
     os.system(f"rm {args.file}.c")
     
