@@ -91,6 +91,7 @@ class TokType(Enum):
     
     ADDRESS              = auto() # &
     DEREFERENCE          = auto() # *
+    NAMESPACE_DEREF      = auto() # ::
     
     ARROW                = auto() # -
     QUESTION             = auto() # ?
