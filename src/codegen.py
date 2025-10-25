@@ -203,9 +203,11 @@ if __name__ == "__main__":
     arg_parser.add_argument("--output", "-o")
     arg_parser.add_argument("--link",   "-l", action="append")
     arg_parser.add_argument("--debug",  "-d", action="store_true")
-    arg_parser.add_argument("--compiler")
+    arg_parser.add_argument("--compiler",     help="specify compiler, clang by default")
     args = arg_parser.parse_args()
-
+    
+    compiler = args.compiler or "clang" # clang by default
+    
     try:
         file = open(args.file, "r").read()
     except FileNotFoundError:
@@ -216,13 +218,13 @@ if __name__ == "__main__":
     
     preprocessor = Preprocessor(lexer)
     lexer.tokens = preprocessor.new_tokens
+    if args.debug:
+        for i in lexer.tokens:
+            print(i.literal, end=' ')
     
     parser = Parser(lexer)
     
     gen = CodeGen(parser)
-    if args.debug:
-        for i in lexer.tokens:
-            print(i.literal, end=' ')
     
     if args.debug:
         print(args)
@@ -237,11 +239,8 @@ if __name__ == "__main__":
             
     with open(f"{args.file}.c", "w") as f:
         f.write(' '.join(gen.output))
-        
-    if args.compiler: # TODO: refactor this block
-        compile_cmd = args.compiler + f" {args.file}.c" + f" -o {args.output}" if args.output else ""
-    else:
-        compile_cmd = "clang" + f" {args.file}.c" + f" -o {args.output}" if args.output else ""
+    
+    compile_cmd = compiler + f" {args.file}.c" + f" -o {args.output}" if args.output else ""
     if args.link:
         for i in args.link:
             compile_cmd += f" -l{i}"
