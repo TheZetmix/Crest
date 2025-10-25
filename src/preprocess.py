@@ -5,7 +5,7 @@ import os
 
 class Preprocessor:
     def __init__(self, lexer, included_files=None):
-        self.new_tokens = [i for i in lexer.tokens]
+        self.new_tokens = lexer.tokens[:]
         self.pos = 0
         self.lexer = lexer
         self.current = self.new_tokens[self.pos]
@@ -15,11 +15,11 @@ class Preprocessor:
         while self.new_tokens[self.pos].type != TokType.EOF:
             if self.current.type == TokType.KEYWORD_USING:
                 self.include_via_using()
-            if self.current.literal == "::":
+            elif self.current.type == TokType.NAMESPACE_DEREF:
                 self.remove()
+            else:
+                self.next()
                 
-            self.next()
-    
     def include_via_using(self):
         self.remove()
         
@@ -27,17 +27,31 @@ class Preprocessor:
         while self.current.type != TokType.SEMICOLON:
             include_libname += self.current.literal
             self.remove()
-        use_libname = self.new_tokens[self.pos-1].literal
         include_libname += ".crs"
+        
+        # TODO: refactor this, if there is no such thing - recursive preprocessor will concatenate filepaths
+        include_libname = '/' + include_libname.split('//')[-1]
+        
         if not os.path.exists(include_libname):
-            error(f"file not found, line {self.current.pos}")
+            error(f"file {include_libname} not found, line {self.current.pos}")
         self.remove(expect=TokType.SEMICOLON)
         
-        
-        
+        if include_libname not in self.included:
+            self.included.append(include_libname)
+            f = open(include_libname, 'r').read()
+            included_lexer = Lexer(f, include_libname)
+            included_lexer.make_all_tokens()
+            
+            included_preprocessor = Preprocessor(included_lexer, included_files=self.included)
+            included_lexer.tokens = included_preprocessor.new_tokens
+            
+            self.insert(self.pos, included_lexer.tokens)
+            
     def insert(self, pos, to_insert):
         self.new_tokens[pos:pos] = to_insert
-    
+        self.pos += len(to_insert)
+        self.current = self.new_tokens[self.pos]
+        
     def remove(self, expect=None):
         if expect != None and self.current.type != expect:
             error(f"expected {expect}, got {self.current.literal}, line {self.current.pos}")
