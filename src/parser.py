@@ -319,7 +319,7 @@ class Parser:
             cur.append(self.current.literal)
             self.next()
         if cur: args.append(cur)
-        self.expect(TokType.SEMICOLON)
+        
         return self.get_ir_node("FuncCall", name=name, args=args)
     
     def parse_funcdef(self):
