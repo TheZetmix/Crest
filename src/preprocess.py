@@ -19,7 +19,11 @@ class Preprocessor:
                 self.remove()
             else:
                 self.next()
-                
+        
+        lexer.tokens = self.new_tokens
+        lexer.pos = 0
+        lexer.current = lexer.tokens[0]
+        
     def include_via_using(self):
         self.remove()
         
@@ -29,7 +33,7 @@ class Preprocessor:
             self.remove()
         include_libname += ".crs"
         
-        # TODO: refactor this, if there is no such thing - recursive preprocessor will concatenate filepaths
+        # TODO: refactor this, if there is no such thing - recursive preprocessor will concatenate filepaths between each other
         include_libname = '/' + include_libname.split('//')[-1]
         
         if not os.path.exists(include_libname):
@@ -45,11 +49,11 @@ class Preprocessor:
             included_preprocessor = Preprocessor(included_lexer, included_files=self.included)
             included_lexer.tokens = included_preprocessor.new_tokens
             
-            self.insert(self.pos, included_lexer.tokens)
+            self.insert(self.pos, included_lexer.tokens[:-1])
             
+    
     def insert(self, pos, to_insert):
         self.new_tokens[pos:pos] = to_insert
-        self.pos += len(to_insert)
         self.current = self.new_tokens[self.pos]
         
     def remove(self, expect=None):
