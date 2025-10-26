@@ -23,12 +23,12 @@ class CodeGen:
     def gen_from_node(self, node):
         match node[0]:
             case "Alias":
-                self.output.append("typedef")
-                for i in node[1]["to_name"]:
-                    self.output.append(i)
+                self.output.append("#define")
                 for i in node[1]["from_name"]:
                     self.output.append(i)
-                self.output.append(';')
+                for i in node[1]["to_name"]:
+                    self.output.append(i)
+                self.output.append('\n')
             case "Continue":
                 self.output.append("continue;")
             case "Break":
@@ -241,6 +241,6 @@ if __name__ == "__main__":
         for i in args.link:
             compile_cmd += f" -l{i}"
     if args.debug: print(compile_cmd)
-    # os.system(compile_cmd)
+    os.system(compile_cmd)
     os.system(f"rm {args.file}.c")
     
