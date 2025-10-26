@@ -37,6 +37,7 @@ class Preprocessor:
         while self.current.type != TokType.SEMICOLON:
             include_libname += self.current.literal
             self.remove()
+        namespace_name = include_libname.split('/')[-1]
         include_libname += ".crs"
         
         # TODO: refactor this, if there is no such thing - recursive preprocessor will concatenate filepaths between each other
@@ -56,7 +57,21 @@ class Preprocessor:
             included_lexer.tokens = included_preprocessor.new_tokens
             
             # TODO: implement autonamespacing
-            self.insert(self.pos, included_lexer.tokens[:-1])
+            tokens_to_insert = self.make_namespace(namespace_name, included_lexer.tokens[:-1])
+            self.insert(self.pos, tokens_to_insert)
+        return
+    
+    def make_namespace(self, namespace_name, tokens):
+        new_tokens = tokens[:]
+        i = 0
+        while i < len(new_tokens):
+            if new_tokens[i].type == TokType.KEYWORD_FN:
+                i += 1
+                new_tokens[i] = Token(TokType.ID, f"namespace_{namespace_name}_included_{new_tokens[i].literal}", tokens[i].pos)
+                
+            i += 1
+        
+        return new_tokens
     
     def insert(self, pos, to_insert):
         self.new_tokens[pos:pos] = to_insert
