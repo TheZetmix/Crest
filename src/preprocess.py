@@ -12,6 +12,8 @@ class Preprocessor:
         
         self.included = included_files if included_files else []
         
+        self.namespace_functions = []
+        
         while self.new_tokens[self.pos].type != TokType.EOF:
             if self.current.type == TokType.KEYWORD_USING:
                 self.include_via_using()
@@ -22,6 +24,8 @@ class Preprocessor:
                 self.remove()
                 namespace_function = self.current.literal
                 self.remove()
+                if namespace_function not in self.namespace_functions:
+                    error(f"{namespace_function} not found in namespace {namespace_name}")
                 self.insert(self.pos, [Token(TokType.ID, f"namespace_{namespace_name}_included_{namespace_function}", self.current.pos)])
             else:
                 self.next()
@@ -56,7 +60,6 @@ class Preprocessor:
             included_preprocessor = Preprocessor(included_lexer, included_files=self.included)
             included_lexer.tokens = included_preprocessor.new_tokens
             
-            # TODO: implement autonamespacing
             tokens_to_insert = self.make_namespace(namespace_name, included_lexer.tokens[:-1])
             self.insert(self.pos, tokens_to_insert)
         return
@@ -68,6 +71,7 @@ class Preprocessor:
             if new_tokens[i].type == TokType.KEYWORD_FN:
                 i += 1
                 new_tokens[i] = Token(TokType.ID, f"namespace_{namespace_name}_included_{new_tokens[i].literal}", tokens[i].pos)
+                self.namespace_functions.append(tokens[i].literal)
                 
             i += 1
         
