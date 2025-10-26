@@ -2,6 +2,8 @@
     "stdio.h"
 }
 
-fn println(s : *char) : void {
-    printf("%s\n", s);
+alias string = char*;
+
+fn println(s : string) : void {
+    printf("%s\n", s)
 }
