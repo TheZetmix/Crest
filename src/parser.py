@@ -294,6 +294,7 @@ class Parser:
         self.expect(TokType.ID) # skip name
         self.expect(TokType.LPAREN) # skip (
         if self.current.type == TokType.RPAREN: # if there is no args at all
+            self.expect(TokType.RPAREN)
             self.expect(TokType.SEMICOLON)
             return self.get_ir_node("FuncCall", name=name, args=[])
         if self.peek().type == TokType.RPAREN: # if there is only one arg
