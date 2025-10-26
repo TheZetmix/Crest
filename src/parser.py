@@ -294,9 +294,12 @@ class Parser:
         self.expect(TokType.ID) # skip name
         self.expect(TokType.LPAREN) # skip (
         if self.current.type == TokType.RPAREN: # if there is no args at all
+            self.expect(TokType.SEMICOLON)
             return self.get_ir_node("FuncCall", name=name, args=[])
         if self.peek().type == TokType.RPAREN: # if there is only one arg
             expr = self.parse_expr(TokType.RPAREN)
+            self.expect(TokType.RPAREN)
+            self.expect(TokType.SEMICOLON)
             return self.get_ir_node("FuncCall", name=name, args=[expr])
         
         args, cur = [], []
@@ -316,6 +319,7 @@ class Parser:
             cur.append(self.current.literal)
             self.next()
         if cur: args.append(cur)
+        self.expect(TokType.SEMICOLON)
         return self.get_ir_node("FuncCall", name=name, args=args)
     
     def parse_funcdef(self):
