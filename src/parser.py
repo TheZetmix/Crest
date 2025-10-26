@@ -212,10 +212,6 @@ class Parser:
         return returned
     
     def parse_assign_expression(self):
-        while self.current.type not in [TokType.SEMICOLON, TokType.NEWLINE, TokType.LBODY]:
-            self.pos -= 1
-            self.current = self.tokens[self.pos]
-        self.next()
         lvalue = self.parse_expr(
             TokType.ASSIGN,
             TokType.PLUS_ASSIGN,
