@@ -12,7 +12,7 @@ class Preprocessor:
         
         self.included = included_files if included_files else []
         
-        self.namespace_functions = []
+        self.namespace_items = []
         
         while self.new_tokens[self.pos].type != TokType.EOF:
             if self.current.type == TokType.KEYWORD_USING:
@@ -24,12 +24,12 @@ class Preprocessor:
                 self.remove()
                 namespace_function = self.current.literal
                 self.remove()
-                if namespace_function not in self.namespace_functions:
-                    error(f"{namespace_function} not found in namespace {namespace_name}")
+                if namespace_function not in self.namespace_items:
+                    error(f"{namespace_function} not found in namespace {namespace_name}, or {namespace_name} not included")
                 self.insert(self.pos, [Token(TokType.ID, f"namespace_{namespace_name}_included_{namespace_function}", self.current.pos)])
             else:
                 self.next()
-                
+            
         lexer.tokens = self.new_tokens
         lexer.pos = 0
         lexer.current = lexer.tokens[0]
@@ -70,9 +70,19 @@ class Preprocessor:
         while i < len(new_tokens):
             if new_tokens[i].type == TokType.KEYWORD_FN:
                 i += 1
-                new_tokens[i] = Token(TokType.ID, f"namespace_{namespace_name}_included_{new_tokens[i].literal}", tokens[i].pos)
-                self.namespace_functions.append(tokens[i].literal)
-                
+                self.namespace_items.append(tokens[i].literal)
+                new_tokens[i].literal = f"namespace_{namespace_name}_included_{new_tokens[i].literal}"
+            if new_tokens[i].type == TokType.KEYWORD_ALIAS:
+                i += 1
+                from_name = new_tokens[i].literal
+                self.namespace_items.append(from_name)
+                new_tokens[i].literal = f"namespace_{namespace_name}_included_{new_tokens[i].literal}"
+            if new_tokens[i].type == TokType.KEYWORD_VAR:
+                i += 1
+                from_name = new_tokens[i].literal
+                self.namespace_items.append(from_name)
+                new_tokens[i].literal = f"namespace_{namespace_name}_included_{new_tokens[i].literal}"
+            
             i += 1
         
         return new_tokens
