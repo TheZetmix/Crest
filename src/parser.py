@@ -1,12 +1,12 @@
 from lexer import *
 from token import *
 from error import *
-from enum import Enum, auto
 
 class Parser:
     def __init__(self, lexer):
         self.lexer = lexer
         self.tokens = lexer.tokens
+        
         self.ir = []
         self.pos = 0
         self.current = self.tokens[self.pos]
@@ -87,6 +87,9 @@ class Parser:
                 case TokType.RBODY:
                     parent = self.entered_bodies.pop()
                     self.ir.append(self.get_ir_node("BodyExit", parent=parent))
+                case _:
+                    if self.current.type != TokType.NEWLINE:
+                        error(f"unexpected token {self.current.literal}, line {self.current.pos}")
             self.next()
         return
     
