@@ -16,10 +16,16 @@ class Preprocessor:
             if self.current.type == TokType.KEYWORD_USING:
                 self.include_via_using()
             elif self.current.type == TokType.NAMESPACE_DEREF:
+                self.prev()
+                namespace_name = self.current.literal
                 self.remove()
+                self.remove()
+                namespace_function = self.current.literal
+                self.remove()
+                self.insert(self.pos, [Token(TokType.ID, f"namespace_{namespace_name}_included_{namespace_function}", self.current.pos)])
             else:
                 self.next()
-        
+                
         lexer.tokens = self.new_tokens
         lexer.pos = 0
         lexer.current = lexer.tokens[0]
@@ -49,8 +55,8 @@ class Preprocessor:
             included_preprocessor = Preprocessor(included_lexer, included_files=self.included)
             included_lexer.tokens = included_preprocessor.new_tokens
             
+            # TODO: implement autonamespacing
             self.insert(self.pos, included_lexer.tokens[:-1])
-            
     
     def insert(self, pos, to_insert):
         self.new_tokens[pos:pos] = to_insert
@@ -64,6 +70,10 @@ class Preprocessor:
     
     def next(self):
         self.pos += 1
+        self.current = self.new_tokens[self.pos]
+    
+    def prev(self):
+        self.pos -= 1
         self.current = self.new_tokens[self.pos]
     
     def expect(self, type):
