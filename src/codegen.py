@@ -217,6 +217,9 @@ if __name__ == "__main__":
     lexer.make_all_tokens()
     
     preprocessor = Preprocessor(lexer)
+    if args.debug:
+        for i in lexer.tokens:
+            print(i.literal, end=' ')
     
     parser = Parser(lexer)
     
