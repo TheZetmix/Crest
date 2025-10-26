@@ -70,13 +70,16 @@ class Parser:
                 case TokType.KEYWORD_RETURN:
                     parsed = self.parse_return()
                     self.ir.append(parsed)
-                case TokType.ASSIGN | TokType.PLUS_ASSIGN | TokType.MINUS_ASSIGN | TokType.MULTIPLY_ASSIGN | TokType.DIVIDE_ASSIGN | TokType.MODULO_ASSIGN | TokType.AND_ASSIGN | TokType.OR_ASSIGN | TokType.XOR_ASSIGN | TokType.SHIFT_LEFT | TokType.SHIFT_RIGHT | TokType.INCREMENT | TokType.DECREMENT:
-                    parsed = self.parse_assign_expression();
-                    self.ir.append(parsed)
+                case TokType.MULTIPLY:
+                    if self.peek().type in [TokType.ID, TokType.LPAREN]:
+                        parsed = self.parse_assign_expression()
+                        self.ir.append(parsed)
                 case TokType.ID:
                     if self.peek().type == TokType.LPAREN:
                         parsed = self.parse_funccall()
-                        self.ir.append(parsed)
+                    elif self.peek().type in [TokType.LBRACE, TokType.DOT, TokType.ARROW]:
+                        parsed = self.parse_assign_expression()
+                    self.ir.append(parsed)
                 case TokType.KEYWORD_VAR:
                     parsed = self.parse_vardef()
                     self.ir.append(parsed)
@@ -87,8 +90,9 @@ class Parser:
                 case TokType.RBODY:
                     parent = self.entered_bodies.pop()
                     self.ir.append(self.get_ir_node("BodyExit", parent=parent))
+                    self.next()
                 case _:
-                    if self.current.type != TokType.NEWLINE:
+                    if self.current.type not in [TokType.NEWLINE]:
                         error(f"unexpected token {self.current.literal}, line {self.current.pos}")
             self.next()
         return
@@ -98,6 +102,7 @@ class Parser:
         from_name = self.parse_expr(TokType.ASSIGN)
         self.expect(TokType.ASSIGN)
         to_name = self.parse_expr(TokType.SEMICOLON)
+        self.expect(TokType.SEMICOLON)
         return self.get_ir_node("Alias", from_name=from_name, to_name=to_name)
         
     def parse_struct(self):
@@ -124,6 +129,7 @@ class Parser:
             return self.get_ir_node("MatchCase", expr=None)
         self.next() # skip case keyword
         expr = self.parse_expr(TokType.LBODY)
+        self.expect(TokType.LBODY)
         return self.get_ir_node("MatchCase", expr=expr)
     
     def parse_match(self):
@@ -142,9 +148,9 @@ class Parser:
         self.expect(TokType.ID) # skip type
         self.expect(TokType.ASSIGN) # skip =
         assign_expr = self.parse_expr(TokType.SEMICOLON)
-        self.next() # skip first ;
+        self.expect(TokType.SEMICOLON) # skip first ;
         expr = self.parse_expr(TokType.SEMICOLON)
-        self.next() # skip second ;
+        self.expect(TokType.SEMICOLON) # skip second ;
         iter_modification = []
         brace = 1
         while brace > 0:
@@ -206,31 +212,30 @@ class Parser:
         return returned
     
     def parse_assign_expression(self):
-        while self.current.type not in [TokType.SEMICOLON, TokType.NEWLINE]:
+        while self.current.type not in [TokType.SEMICOLON, TokType.NEWLINE, TokType.LBODY]:
             self.pos -= 1
             self.current = self.tokens[self.pos]
         self.next()
-        lvalue = []
-        while self.current.type not in [
-                        TokType.ASSIGN,
-                        TokType.PLUS_ASSIGN,
-                        TokType.MINUS_ASSIGN,
-                        TokType.MULTIPLY_ASSIGN,
-                        TokType.DIVIDE_ASSIGN,
-                        TokType.MODULO_ASSIGN,
-                        TokType.AND_ASSIGN,
-                        TokType.OR_ASSIGN,
-                        TokType.XOR_ASSIGN,
-                        TokType.SHIFT_LEFT,
-                        TokType.SHIFT_RIGHT,
-                        TokType.INCREMENT,
-                        TokType.DECREMENT]:
-            lvalue.append(self.current.literal)
-            self.next()
+        lvalue = self.parse_expr(
+            TokType.ASSIGN,
+            TokType.PLUS_ASSIGN,
+            TokType.MINUS_ASSIGN,
+            TokType.MULTIPLY_ASSIGN,
+            TokType.DIVIDE_ASSIGN,
+            TokType.MODULO_ASSIGN,
+            TokType.AND_ASSIGN,
+            TokType.OR_ASSIGN,
+            TokType.XOR_ASSIGN,
+            TokType.SHIFT_LEFT_ASSIGN,
+            TokType.SHIFT_RIGHT_ASSIGN,
+            TokType.INCREMENT,
+            TokType.DECREMENT
+        )
         op = self.current.literal
         self.next()
         if op not in ["++", "--"]:
             rvalue = self.parse_expr(TokType.SEMICOLON)
+            self.expect(TokType.SEMICOLON)
         else:
             rvalue = None
         
@@ -287,6 +292,7 @@ class Parser:
     def parse_return(self):
         self.next() # skip 'return' keyword
         expr = self.parse_expr(TokType.SEMICOLON)
+        self.expect(TokType.SEMICOLON)
         return self.get_ir_node("Return", expr=expr)
     
     def parse_funccall(self):
@@ -320,7 +326,8 @@ class Parser:
             cur.append(self.current.literal)
             self.next()
         if cur: args.append(cur)
-        
+        self.expect(TokType.RPAREN);
+        self.expect(TokType.SEMICOLON);
         return self.get_ir_node("FuncCall", name=name, args=args)
     
     def parse_funcdef(self):
@@ -330,6 +337,7 @@ class Parser:
         if self.current.type == TokType.COLON:
             self.expect(TokType.COLON)
             func_type = self.parse_type()
+            self.expect(TokType.LBODY)
             return self.get_ir_node("FuncDef", name=name, args=[], type=func_type)
         self.expect(TokType.LPAREN)
         
@@ -346,6 +354,7 @@ class Parser:
         self.expect(TokType.RPAREN)
         self.expect(TokType.COLON)
         func_type = self.parse_type()
+        self.expect(TokType.LBODY)
         return self.get_ir_node("FuncDef", name=name, args=args, type=func_type)
         
     def parse_vardef(self):
@@ -389,15 +398,6 @@ class Parser:
                 expr.append(self.current.literal)
             self.next()
         return expr
-    
-    def parse_until(self, end_type):
-        res = []
-        while self.current.type != end_type:
-            if self.current.type == TokType.SEMICOLON:
-                error(f"parse: unexpected eof at {self.pos}, {self.current.pos+1}")
-            res.append(self.current)
-            self.next()
-        return res
     
     def parse_type(self):
         type = self.current.literal

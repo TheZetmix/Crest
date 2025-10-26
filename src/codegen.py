@@ -30,9 +30,9 @@ class CodeGen:
                     self.output.append(i)
                 self.output.append('\n')
             case "Continue":
-                self.output.append("continue;")
+                self.output.append("continue;\n")
             case "Break":
-                self.output.append("break;")
+                self.output.append("break;\n")
             case "StructDef":
                 self.output.append("typedef struct")
                 self.output.append("{")
@@ -41,7 +41,7 @@ class CodeGen:
                     self.output.append(i[0])
                     self.output.append(";")
                 self.output.append(f"}} {node[1]["name"]}")
-                self.output.append(';')
+                self.output.append(';\n')
             case "MatchCase":
                 if node[1]["expr"] != None: # TODO: refactor this line
                     expr = [i for i in node[1]["expr"] if i != "||"] # <-
@@ -49,23 +49,25 @@ class CodeGen:
                         self.output.append("case")
                         self.output.append(i)
                         self.output.append(":")
-                    self.output.append("{")
+                    self.output.append("{\n")
                 else:
                     self.output.append("default")
                     self.output.append(":")
-                    self.output.append("{")
+                    self.output.append("{\n")
             case "Match":
                 self.output.append("switch")
                 self.output.append("(")
                 for i in node[1]["expr"]:
                     self.output.append(i)
                 self.output.append(")")
-                self.output.append("{")
+                self.output.append("{\n")
             case "InlineC":
                 self.output.append(node[1]["string"])
+                self.output.append("\n")
             case "IncludeC":
                 for i in node[1]["libs"]:
                     self.output.append(f"# include {i}\n")
+                self.output.append("\n")
             case "ExprAssign":
                 match node[1]["op"]:
                     case "++" | "--":
@@ -78,7 +80,7 @@ class CodeGen:
                         self.output.append(node[1]["op"])
                         for i in node[1]["rvalue"]:
                             self.output.append(i)
-                self.output.append(";")
+                self.output.append(";\n")
             case "For":
                 self.output.append("for")
                 self.output.append("(")
@@ -94,7 +96,7 @@ class CodeGen:
                 for i in node[1]["iter_modification"]:
                     self.output.append(i)
                 self.output.append(")")
-                self.output.append("{")
+                self.output.append("{\n")
             case "Foreach":
                 iterator = "_iterator_obj_" + node[1]["iterator"] + "_" + node[1]["array"]
                 self.output.append("for")
@@ -114,27 +116,21 @@ class CodeGen:
                 self.output.append("=")
                 self.output.append(node[1]["array"])
                 self.output.append(f"[{iterator}]")
-                self.output.append(";")
-            case "Directive":
-                self.output.append("#")
-                self.output.append(node[1]["id"])
-                for i in node[1]["content"]:
-                    self.output.append(i)
-                self.output.append("\n")
+                self.output.append(";\n")
             case "While":
                 self.output.append("while")
                 self.output.append("(")
                 for i in node[1]["expr"]:
                     self.output.append(i)
                 self.output.append(")")
-                self.output.append("{")
+                self.output.append("{\n")
             case "IfStatement":
                 self.output.append("if")
                 self.output.append("(")
                 for i in node[1]["expr"]:
                     self.output.append(i)
                 self.output.append(")")
-                self.output.append("{")
+                self.output.append("{\n")
             case "Else":
                 self.output.append("else")
                 self.output.append("{")
@@ -145,7 +141,7 @@ class CodeGen:
                 for i in node[1]["expr"]:
                     self.output.append(i)
                 self.output.append(")")
-                self.output.append("{")
+                self.output.append("{\n")
             case "VarDef":
                 self.output.append(node[1]["type"])
                 self.output.append(node[1]["name"])
@@ -153,13 +149,13 @@ class CodeGen:
                     self.output.append('=')
                     for i in node[1]["expr"]:
                         self.output.append(i)
-                self.output.append(';');
+                self.output.append(';\n');
             case "IdAssign":
                 self.output.append(node[1]["name"])
                 self.output.append("=")
                 for i in node[1]["expr"]:
                     self.output.append(i)
-                self.output.append(";")
+                self.output.append(";\n")
             case "FuncDef":
                 self.defined_funcs.append(node[1]["name"])
                 self.output.append(node[1]["type"])
@@ -171,18 +167,18 @@ class CodeGen:
                     if i != node[1]["args"][-1]:
                         self.output.append(',')
                 self.output.append(')')
-                self.output.append('{')
+                self.output.append('{\n')
             case "Return":
                 self.output.append('return')
                 for i in node[1]["expr"]:
                     self.output.append(i)
-                self.output.append(';')
+                self.output.append(';\n')
             case "BodyExit":
                 match node[1]["parent"][0]:
                     case "MatchCase":
-                        self.output.append('break ; }')
+                        self.output.append('break ;\n}')
                     case _:
-                        self.output.append('}')
+                        self.output.append('}\n')
             case "FuncCall":
                 self.output.append(node[1]["name"])
                 self.output.append('(')
@@ -195,7 +191,7 @@ class CodeGen:
                     if i != len(node[1]["args"])-1:
                         self.output.append(',')
                 self.output.append(')')
-                self.output.append(';')
+                self.output.append(';\n')
             
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
@@ -232,9 +228,8 @@ if __name__ == "__main__":
             node_name = i[0]
             print(node_name, " " * (12 - len(node_name)), i[1])
         print("generated:")
-        output = [i if i not in ';{}' else f"{i}\n" for i in gen.output ]
-        for i in output:
-            print(i, end=' ' if '\n' not in i else '')
+        for i in gen.output:
+            print(i, end=' ')
             
     with open(f"{args.file}.c", "w") as f:
         f.write(' '.join(gen.output))
