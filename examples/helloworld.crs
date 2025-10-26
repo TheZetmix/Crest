@@ -1,5 +1,5 @@
 using std;
 
 fn main : int {
-    std::println("Hello, World!");
+    printf("Hello, World!\n");
 }
