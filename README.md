@@ -14,13 +14,4 @@ fn main() : int {
 }
 ```
 
-Check out more examples in the examples/ folder.
-
-### About
-
-Crest is designed to be easy to learn, while allowing low-level control through C features.
-
-### License
-
-MIT License
-
+Check out more examples in the `examples/` folder.
